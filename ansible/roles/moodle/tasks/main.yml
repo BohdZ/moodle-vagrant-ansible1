@@ -1,0 +1,58 @@
+- name: Download Moodle
+  get_url:
+    url: https://download.moodle.org/download.php/direct/stable404/moodle-latest-404.tgz
+    dest: /tmp/moodle.tgz
+
+- name: Extract Moodle
+  unarchive:
+    src: /tmp/moodle.tgz
+    dest: /var/www/
+    remote_src: yes
+
+- name: Create moodledata directory
+  file:
+    path: /var/www/moodledata
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0777'
+
+- name: Set Moodle permissions
+  file:
+    path: /var/www/moodle
+    owner: www-data
+    group: www-data
+    recurse: yes
+
+- name: Wait for database
+  wait_for:
+    host: 192.168.56.11
+    port: 3306
+    timeout: 60
+
+- name: Install Moodle automatically
+  command: >
+    php /var/www/moodle/admin/cli/install.php
+    --chmod=2777
+    --lang=en
+    --wwwroot=http://192.168.56.10/moodle
+    --dataroot=/var/www/moodledata
+    --dbtype=mariadb
+    --dbhost=192.168.56.11
+    --dbname=moodle
+    --dbuser=moodleuser
+    --dbpass=moodlepass
+    --fullname="Moodle Server"
+    --shortname="Moodle"
+    --adminuser=admin
+    --adminpass=Admin123!
+    --adminemail=admin@example.com
+    --non-interactive
+    --agree-license
+  args:
+    creates: /var/www/moodle/config.php
+
+- name: Restart Apache
+  service:
+    name: apache2
+    state: restarted
