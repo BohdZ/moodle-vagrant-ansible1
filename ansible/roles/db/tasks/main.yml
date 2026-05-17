@@ -1,0 +1,35 @@
+- name: Install MariaDB
+  apt:
+    name:
+      - mariadb-server
+    state: present
+
+- name: Start MariaDB
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+
+- name: Allow remote connections
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: '^bind-address'
+    line: 'bind-address = 0.0.0.0'
+
+- name: Restart MariaDB
+  service:
+    name: mariadb
+    state: restarted
+
+- name: Create Moodle database
+  mysql_db:
+    name: moodle
+    state: present
+
+- name: Create Moodle user
+  mysql_user:
+    name: moodleuser
+    password: moodlepass
+    priv: 'moodle.*:ALL'
+    host: '%'
+    state: present
