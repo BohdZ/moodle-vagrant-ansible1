@@ -1,0 +1,20 @@
+moodle-vagrant-ansible/
+├── Vagrantfile
+├── README.md
+├── .gitignore
+└── ansible/
+    ├── inventory.ini
+    ├── playbook.yml
+    └── roles/
+        ├── common/
+        │   └── tasks/
+        │       └── main.yml
+        ├── db/
+        │   └── tasks/
+        │       └── main.yml
+        ├── web/
+        │   └── tasks/
+        │       └── main.yml
+        └── moodle/
+            └── tasks/
+                └── main.yml
